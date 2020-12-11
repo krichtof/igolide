@@ -1,7 +1,7 @@
 require 'sinatra'
 
 get '/' do
-  "Welcome to Notif Light"
+  "Notif Light crée une animation visuelle quand un événement survient"
 end
 
 post '/events' do
