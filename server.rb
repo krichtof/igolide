@@ -5,5 +5,5 @@ get '/' do
 end
 
 post '/events' do
-  puts "params: #{params}"
+  `python3 ble_guirlande_client.py`
 end
