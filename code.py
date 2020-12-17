@@ -11,6 +11,7 @@ Adafruit invests time and resources to bring you this code! Please support our s
 
 import board
 import neopixel
+import time
 from adafruit_led_animation.animation.solid import Solid
 from adafruit_led_animation.animation.comet import Comet
 from adafruit_led_animation.animation.rainbow import Rainbow
@@ -71,9 +72,11 @@ fire = AnimationGroup(
 # Here is the animation playlist where you set the order of modes
 
 animations = AnimationSequence(brightWhite, fire, warning)
-times = 20
+times = 20000
 count = 0
 MODE = 0
+start_at = time.time()
+duration = 10
 
 while True:
     if MODE == 0:  # If currently off...
@@ -93,20 +96,24 @@ while True:
     # Now we're connected
 
     while ble.connected:
-        s = uart_service.readline().decode("utf-8").strip()
-        if s == 'celebrate':
-            count = 0
-            MODE = 1
-            animations.activate(1)
-            print("oh yeah ! celebrate !")
-        elif s == 'warning':
-            count = 0
-            MODE = 1
-            animations.activate(1)
-        if count > times:
+        if uart_service.in_waiting:
+            s = uart_service.readline().decode("utf-8").strip()
+            if s == 'celebrate':
+                count = 0
+                start_at = now
+                MODE = 1
+                animations.activate(1)
+            elif s == 'warning':
+                count = 0
+                start_at = now
+                MODE = 1
+                animations.activate(2)
+        now = time.time()
+        if (now - start_at) > duration:
             MODE = 3
             count = 0
-            off.animate()
+            start_at = now
+            brightWhite.animate()
         if MODE == 1:
             animations.animate()
             count += 1
