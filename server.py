@@ -1,6 +1,5 @@
 from flask import Flask
 from flask import request
-import json
 app = Flask(__name__)
 
 from adafruit_ble import BLERadio
@@ -8,6 +7,8 @@ from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
 from adafruit_bluefruit_connect.color_packet import ColorPacket
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
+
+from event import Event
 
 ble = BLERadio()
 
@@ -26,14 +27,14 @@ if not uart_connection:
 def index():
     return "Notif Light anime votre salon lorsqu'un événement survient"
 
-@app.route('/events', methods=['GET','POST'])
+@app.route('/events', methods=['POST'])
 def handle_event():
-    data = json.loads(request.form['payload'])
-    print(data["commits"][0]["author"]["username"])
+    event = Event.from_request(request)
 
-    if uart_connection and uart_connection.connected:
+    if event and event.packet and uart_connection and uart_connection.connected:
         uart_service = uart_connection[UARTService]
-        uart_service.write("warning".encode("utf-8"))
-        uart_service.write(b'\n')
+        uart_service.write(event.packet.to_bytes())
+    else:
+        print("Event ignored")
 
     return "Ok guy"
