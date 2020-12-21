@@ -9,6 +9,7 @@ from adafruit_bluefruit_connect.color_packet import ColorPacket
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 
 from event import Event
+from event_packet import EventPacket
 
 ble = BLERadio()
 
@@ -38,3 +39,20 @@ def handle_event():
         print("Event ignored")
 
     return "Ok guy"
+
+@app.route('/success', methods=['POST'])
+def display_success_animation():
+    duration = None
+    try:
+        duration = int(request.form['duration'])
+    except KeyError:
+        pass
+
+    if uart_connection and uart_connection.connected:
+        uart_service = uart_connection[UARTService]
+        uart_service.write(EventPacket(EventPacket.SUCCESS, duration).to_bytes())
+    else:
+        print("No bluetooth connection")
+        abort(500)
+
+    return "Success animation displayed"

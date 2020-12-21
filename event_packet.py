@@ -4,6 +4,7 @@ from adafruit_bluefruit_connect.packet import Packet
 class EventPacket(Packet):
     SUCCESS = "1"
     WARNING = "2"
+    DEFAULT_DURATION = 10
 
     _FMT_PARSE = "<xxsix"
     PACKET_LENGTH = struct.calcsize(_FMT_PARSE)
@@ -12,7 +13,7 @@ class EventPacket(Packet):
 
     def __init__(self, event, duration):
         self._event = event
-        self._duration = duration
+        self._duration = duration or DEFAULT_DURATION
 
     @classmethod
     def parse_private(cls, packet):
