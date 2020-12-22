@@ -12,6 +12,7 @@ Adafruit invests time and resources to bring you this code! Please support our s
 import time
 import board
 import neopixel
+from adafruit_circuitplayground import cp
 from adafruit_led_animation.animation.solid import Solid
 from adafruit_led_animation.animation.comet import Comet
 from adafruit_led_animation.animation.rainbow import Rainbow
@@ -120,6 +121,8 @@ MODE = 0
 start_at = 0
 duration = 0
 
+off_at = 0
+on_at = 0
 
 while True:
     if MODE == 0:  # If currently off...
@@ -132,6 +135,9 @@ while True:
     elif MODE >= 1:  # If not OFF MODE...
         ble.start_advertising(advertisement)
         while not ble.connected:
+            if cp.sound_level > 1500:
+                off.animate()
+                MODE = 4
             if MODE == 2:
                 pass
             elif MODE == 1:
@@ -143,16 +149,33 @@ while True:
                     MODE = 1
                     animations.activate(0)
                 animations.animate()
+            elif MODE == 4:
+                animations.freeze()
     # Now we're connected
 
     while ble.connected:
+        if cp.sound_level > 1500:
+            now = time.time()
+            if MODE != 4:
+                if (now - on_at) > 5:
+                    off.animate()
+                    MODE = 4
+                    off_at = time.time()
+            else:
+                if (now - off_at) > 5:
+                    print("show light")
+                    animations.activate(2)
+                    animations.animate()
+                    MODE = 1
+                    on_at = now
+
+
         if uart_service.in_waiting:
             packet = Packet.from_stream(uart_service)
             # Color Picker Functionality
             if isinstance(packet, ColorPacket):
                 MODE = 2
-                # Set all the pixels to one color and stay there.
-                pixels.fill(packet.color)
+                # Set all the pixels to one color and stay there.  pixels.fill(packet.color)
                 pixels.show()
             # Control Pad Functionality
             elif isinstance(packet, ButtonPacket):

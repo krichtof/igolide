@@ -13,7 +13,7 @@ class EventPacket(Packet):
 
     def __init__(self, event, duration):
         self._event = event
-        self._duration = duration or DEFAULT_DURATION
+        self._duration = duration or self.DEFAULT_DURATION
 
     @classmethod
     def parse_private(cls, packet):
