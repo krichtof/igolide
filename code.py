@@ -135,9 +135,7 @@ while True:
     elif MODE >= 1:  # If not OFF MODE...
         ble.start_advertising(advertisement)
         while not ble.connected:
-            if cp.sound_level > 1500:
-                off.animate()
-                MODE = 4
+            MODE, on_at, off_at = handleClap(MODE, on_at, off_at)
             if MODE == 2:
                 pass
             elif MODE == 1:
@@ -154,20 +152,7 @@ while True:
     # Now we're connected
 
     while ble.connected:
-        if cp.sound_level > 1500:
-            now = time.time()
-            if MODE != 4:
-                if (now - on_at) > 5:
-                    off.animate()
-                    MODE = 4
-                    off_at = time.time()
-            else:
-                if (now - off_at) > 5:
-                    print("show light")
-                    animations.activate(2)
-                    animations.animate()
-                    MODE = 1
-                    on_at = now
+        MODE, on_at, off_at = handleClap(MODE, on_at, off_at)
 
 
         if uart_service.in_waiting:
@@ -235,3 +220,23 @@ while True:
                 MODE = 1
                 animations.activate(0)
             animations.animate()
+
+    def handleClap(MODE, on_at, off_at):
+        if cp.sound_level > 1500:
+            print("in handleClap")
+            now = time.time()
+            if MODE != 4:
+                print("switch off light...")
+                if (now - on_at) > 5:
+                    off.animate()
+                    MODE = 4
+                    off_at = time.time()
+            else:
+                if (now - off_at) > 5:
+                    print("show light")
+                    animations.activate(2)
+                    animations.animate()
+                    MODE = 1
+                    on_at = now
+        return [MODE, on_at, off_at]
+
