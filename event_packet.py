@@ -4,6 +4,9 @@ from adafruit_bluefruit_connect.packet import Packet
 class EventPacket(Packet):
     SUCCESS = "1"
     WARNING = "2"
+    START_POMODORO = "3"
+    START_BREAK = "4"
+    END_POMODORO = "5"
     DEFAULT_DURATION = 10
 
     _FMT_PARSE = "<xxsix"
@@ -11,7 +14,7 @@ class EventPacket(Packet):
     _FMT_CONSTRUCT = "<2ssi"
     _TYPE_HEADER = b"!X"
 
-    def __init__(self, event, duration):
+    def __init__(self, event, duration=False):
         self._event = event
         self._duration = duration or self.DEFAULT_DURATION
 

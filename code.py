@@ -29,6 +29,7 @@ from adafruit_led_animation.color import (
     WHITE,
     RED,
     BLACK,
+    GREEN,
     colorwheel,
 )
 
@@ -81,6 +82,8 @@ class RainbowFade(Animation):
 
 readingLight = Solid(pixels, color=0xFF7D13) #warm white color HEX code
 brightWhite = Solid(pixels, color=(150, 150, 150))
+focus = Solid(pixels, color=RED)
+breakTime = Solid(pixels, color=GREEN)
 rainbow = Rainbow(pixels, speed=0.1, period=10, step=0.5)
 rainbowfade = RainbowFade(pixels, speed=0.4, name="rainbowfade")
 powerup = RainbowComet(pixels, speed=0, tail_length=50, bounce=False)
@@ -112,6 +115,8 @@ animations = AnimationSequence(
         starrynight,
         rainbowfade,
         brightWhite,
+        focus,
+        breakTime,
         auto_clear=True,
         )
 
@@ -201,11 +206,20 @@ while True:
                     duration = packet.duration
                     animations.activate(1)
                     MODE = 3
-                if packet.event == EventPacket.WARNING:
+                elif packet.event == EventPacket.WARNING:
                     start_at = time.time()
                     duration = packet.duration
                     animations.activate(3)
                     MODE = 3
+                elif packet.event == EventPacket.START_POMODORO:
+                    animations.activate(6)
+                    MODE = 1
+                elif packet.event == EventPacket.START_BREAK:
+                    animations.activate(7)
+                    MODE = 1
+                elif packet.event == EventPacket.END_POMODORO:
+                    animations.activate(5)
+                    MODE = 1
 
 
 

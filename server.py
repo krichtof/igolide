@@ -53,6 +53,33 @@ def display_success_animation():
         uart_service.write(EventPacket(EventPacket.SUCCESS, duration).to_bytes())
     else:
         print("No bluetooth connection")
-        abort(500)
 
     return "Success animation displayed"
+
+@app.route('/start_pomodoro', methods=['POST'])
+def start_pomodoro():
+    if uart_connection and uart_connection.connected:
+        uart_service = uart_connection[UARTService]
+        uart_service.write(EventPacket(EventPacket.START_POMODORO).to_bytes())
+    else:
+        print("No bluetooth connection")
+
+    return "Start pomodoro displayed"
+@app.route('/end_pomodoro', methods=['POST'])
+def end_pomodoro():
+    if uart_connection and uart_connection.connected:
+        uart_service = uart_connection[UARTService]
+        uart_service.write(EventPacket(EventPacket.END_POMODORO).to_bytes())
+    else:
+        print("No bluetooth connection")
+
+    return "Start pomodoro displayed"
+@app.route('/start_break', methods=['POST'])
+def start_break():
+    if uart_connection and uart_connection.connected:
+        uart_service = uart_connection[UARTService]
+        uart_service.write(EventPacket(EventPacket.START_BREAK).to_bytes())
+    else:
+        print("No bluetooth connection")
+
+    return "Start break displayed"
